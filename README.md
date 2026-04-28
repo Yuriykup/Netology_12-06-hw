@@ -9,7 +9,7 @@
 *Ответить в свободной форме.*
 
 ---
-## ОВТЕТ на задание 1
+## ОТВЕТ на задание 1.
 
 
 #### Master‑Slave репликация
@@ -80,7 +80,7 @@ Master‑Master подойдет, если:
 *Приложите скриншоты конфигурации, выполнения работы: состояния и режимы работы серверов.*
 
 ---
-## ОВТЕТ на задание 2
+## ОТВЕТ на задание 2.
 
 
 #### 2.1 Конфигурация Master-Slave
@@ -167,8 +167,34 @@ sudo docker run --name mysql_slave -v ./slave.cnf:/etc/my.cnf -p 3308:3306 -e MY
 
 ![Скриншот-3](https://github.com/Yuriykup/Netology_12-06-hw/blob/main/img/img3.png)
 
-2.10 
+2.1.10 Проверка кофигурационных файлов в созданых серверах:
+- Master
+```
+sudo docker exec -ti mysql_master /bin/bash
+bash-5.1# cat /etc/my.cnf
+[mysqld]
+server-id=1
+log-bin = mysql-bin
+binlog_format=ROW
 
+bash-5.1# exit
+```
+- Slave
+```
+sudo docker exec -ti mysql_slave /bin/bash
+bash-5.1# cat /etc/my
+my.cnf    my.cnf.d/ mysql/    
+bash-5.1# cat /etc/my.cnf
+[mysqld]
+server-id=2
+read_only = 1
+bash-5.1# exit
+exit
+```
+
+![Скриншот-4](https://github.com/Yuriykup/Netology_12-06-hw/blob/main/img/img4.png)
+
+#### 2.2 Конфигурация Master-Slave
 
 ---
 ## Дополнительные задания (со звёздочкой*)
