@@ -73,10 +73,6 @@ Master‑Master подойдет, если:
 - не критична дороговизна и сложность настройки и механизмов разрешения конфликтов.
 
 ---
-
-
-
----
 ### Задание 2
 
 Выполните конфигурацию master-slave репликации, примером можно пользоваться из лекции.
@@ -84,7 +80,95 @@ Master‑Master подойдет, если:
 *Приложите скриншоты конфигурации, выполнения работы: состояния и режимы работы серверов.*
 
 ---
+## ОВТЕТ на задание 2
 
+
+#### Конфигурация Master-Slave
+
+2.1 Конфигурируем файл `Dockerfile_master` для Master:
+```
+FROM mysql:9.3
+# Копируем файлы конфигурации
+COPY ./master.cnf /etc/mysql/conf.d/my.cnf
+COPY ./master.sql /docker-entrypoint-initdb.d/start.sql
+# Переменные окружения для настройки репликации
+ENV MYSQL_ROOT_PASSWORD=kuv042026
+# Запускаем сервисы
+CMD ["mysqld"]
+```
+
+2.2 Конфигурируем файл `Dockerfile_slave` для Slave:
+```
+FROM mysql:9.3
+# Копируем файлы конфигурации
+COPY ./slave.cnf /etc/mysql/conf.d/my.cnf
+COPY ./slave.sql /docker-entrypoint-initdb.d/start.sql
+# Переменные окружения для настройки репликации
+ENV MYSQL_ROOT_PASSWORD=kuv042026
+# Запускаем сервисы
+CMD ["mysqld"]
+```
+
+2.3 Конфигурируем скрипт `master.sql` для создания пользователя для репликации:
+```
+-- Файл инициализации мастера master.sql:
+
+CREATE USER 'repl'@'%' IDENTIFIED BY 'password'; -- создаём пользователя для реплики
+GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%'; -- выдаём права для репликации новому пользователю
+FLUSH PRIVILEGES; -- принудительно применяем изменения
+```
+
+2.4 Конфигурируем скрипт `slave.sql` для подключения слейва к мастеру:
+```
+CHANGE REPLICATION SOURCE TO
+SOURCE_HOST='mysql_master',
+-- Имя хоста мастера
+SOURCE_USER='repl',
+-- Имя пользователя
+SOURCE_PASSWORD='slavepass',
+-- Пароль этого пользователя
+SOURCE_SSL=1;
+START REPLICA;
+```
+
+2.5 Создаём конфигурационный файл `master.cnf` для мастера:
+```
+[mysqld]
+server-id = 1
+log-bin = mysql-bin
+binlog-format = ROW
+```
+
+2.6 Создаём конфигурационный файл `slave.cnf` для слейва:
+```
+[mysqld]
+server-id = 2
+read-only = 1
+```
+
+2.7 Собираем образы:
+Сначала из двух Docker-файлов делаем готовые образы для слейва и мастера:
+- docker build -t mysql_slave -f ./Dockerfile_slave .
+- docker build -t mysql_master -f ./Dockerfile_master .
+
+2.8. Создаём сеть:
+```
+sudo docker network create replication .
+```
+
+2.9. Запускаем контейнеры:
+Master и Slave подключаем к кионфиги, пробрасываем разные хост‑порты, указываем пароль и версию SQL:
+```
+sudo docker run --name mysql_master -v ./master.cnf:/etc/my.cnf -p 3307:3306 -e MYSQL_ROOT_PASSWORD=kuv042026 -d mysql:8.4
+sudo docker run --name mysql_slave -v ./slave.cnf:/etc/my.cnf -p 3308:3306 -e MYSQL_ROOT_PASSWORD=kuv042026 -d mysql:8.4
+```
+
+![Скриншот-3](https://github.com/Yuriykup/Netology_12-06-hw/blob/main/img/img3.png)
+
+2.10 
+
+
+---
 ## Дополнительные задания (со звёздочкой*)
 Эти задания дополнительные, то есть не обязательные к выполнению, и никак не повлияют на получение вами зачёта по этому домашнему заданию. Вы можете их выполнить, если хотите глубже шире разобраться в материале.
 
