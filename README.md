@@ -194,16 +194,44 @@ exit
 
 ![Скриншот-4](https://github.com/Yuriykup/Netology_12-06-hw/blob/main/img/img4.png)
 
-#### 2.2 Конфигурация Master-Slave
+#### 2.2 Тестирование работы в режиме Master-Slave
 
----
-## Дополнительные задания (со звёздочкой*)
-Эти задания дополнительные, то есть не обязательные к выполнению, и никак не повлияют на получение вами зачёта по этому домашнему заданию. Вы можете их выполнить, если хотите глубже шире разобраться в материале.
+2.2.1 Подключаемся к Master и создаем пользователя `repl`
 
----
+```
+mysql> CREATE USER 'repl'@'%' IDENTIFIED BY 'password';
+Query OK, 0 rows affected (0.05 sec)
 
-### Задание 3* 
+mysql> GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';
+Query OK, 0 rows affected (0.02 sec)
 
-Выполните конфигурацию master-master репликации. Произведите проверку.
+mysql> FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.02 sec)
 
-*Приложите скриншоты конфигурации, выполнения работы: состояния и режимы работы серверов.*
+mysql> exit
+Bye
+
+```
+![Скриншот-5](https://github.com/Yuriykup/Netology_12-06-hw/blob/main/img/img5.png)
+
+2.2.2 Проверяем спцфический номер "позиции Master-server"
+
+![Скриншот-7](https://github.com/Yuriykup/Netology_12-06-hw/blob/main/img/img7.png)
+
+
+
+2.2.3 На Slave меняем источник репликации, пользователя, пароль и спцфический номер "позиции Master-server"
+
+```
+mysql> CHANGE REPLICATION SOURCE TO SOURCE_HOST='mysql_master', SOURCE_USER='repl', SOURCE_PASSWORD='password', RELAY_LOG_POS=2618;
+```
+
+![Скриншот-6](https://github.com/Yuriykup/Netology_12-06-hw/blob/main/img/img6.png)
+
+
+
+
+
+
+
+
