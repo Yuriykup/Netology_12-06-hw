@@ -83,9 +83,9 @@ Master‑Master подойдет, если:
 ## ОВТЕТ на задание 2
 
 
-#### Конфигурация Master-Slave
+#### 2.1 Конфигурация Master-Slave
 
-2.1 Конфигурируем файл `Dockerfile_master` для Master:
+2.1.1 Конфигурируем файл `Dockerfile_master` для Master:
 ```
 FROM mysql:9.3
 # Копируем файлы конфигурации
@@ -97,7 +97,7 @@ ENV MYSQL_ROOT_PASSWORD=kuv042026
 CMD ["mysqld"]
 ```
 
-2.2 Конфигурируем файл `Dockerfile_slave` для Slave:
+2.1.2 Конфигурируем файл `Dockerfile_slave` для Slave:
 ```
 FROM mysql:9.3
 # Копируем файлы конфигурации
@@ -109,7 +109,7 @@ ENV MYSQL_ROOT_PASSWORD=kuv042026
 CMD ["mysqld"]
 ```
 
-2.3 Конфигурируем скрипт `master.sql` для создания пользователя для репликации:
+2.1.3 Конфигурируем скрипт `master.sql` создания пользователя для репликации:
 ```
 -- Файл инициализации мастера master.sql:
 
@@ -118,7 +118,7 @@ GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%'; -- выдаём права для 
 FLUSH PRIVILEGES; -- принудительно применяем изменения
 ```
 
-2.4 Конфигурируем скрипт `slave.sql` для подключения слейва к мастеру:
+2.1.4 Конфигурируем скрипт `slave.sql` для подключения слейва к мастеру:
 ```
 CHANGE REPLICATION SOURCE TO
 SOURCE_HOST='mysql_master',
@@ -131,7 +131,7 @@ SOURCE_SSL=1;
 START REPLICA;
 ```
 
-2.5 Создаём конфигурационный файл `master.cnf` для мастера:
+2.1.5 Создаём конфигурационный файл `master.cnf` для мастера:
 ```
 [mysqld]
 server-id = 1
@@ -139,24 +139,26 @@ log-bin = mysql-bin
 binlog-format = ROW
 ```
 
-2.6 Создаём конфигурационный файл `slave.cnf` для слейва:
+2.1.6 Создаём конфигурационный файл `slave.cnf` для слейва:
 ```
 [mysqld]
 server-id = 2
 read-only = 1
 ```
 
-2.7 Собираем образы:
+2.1.7 Собираем образы:
 Сначала из двух Docker-файлов делаем готовые образы для слейва и мастера:
-- docker build -t mysql_slave -f ./Dockerfile_slave .
-- docker build -t mysql_master -f ./Dockerfile_master .
+```
+sudo docker build -t mysql_slave -f ./Dockerfile_slave .
+sudo docker build -t mysql_master -f ./Dockerfile_master .
+```
 
-2.8. Создаём сеть:
+2.1.8 Создаём сеть:
 ```
 sudo docker network create replication .
 ```
 
-2.9. Запускаем контейнеры:
+2.1.9. Запускаем контейнеры:
 Master и Slave подключаем к кионфиги, пробрасываем разные хост‑порты, указываем пароль и версию SQL:
 ```
 sudo docker run --name mysql_master -v ./master.cnf:/etc/my.cnf -p 3307:3306 -e MYSQL_ROOT_PASSWORD=kuv042026 -d mysql:8.4
