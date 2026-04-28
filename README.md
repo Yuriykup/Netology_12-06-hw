@@ -214,20 +214,58 @@ Bye
 ```
 ![Скриншот-5](https://github.com/Yuriykup/Netology_12-06-hw/blob/main/img/img5.png)
 
-2.2.2 Проверяем спцфический номер "позиции Master-server"
+2.2.2 Проверяем специфический номер "позиции Master-server"
 
 ![Скриншот-7](https://github.com/Yuriykup/Netology_12-06-hw/blob/main/img/img7.png)
 
 
 
-2.2.3 На Slave меняем источник репликации, пользователя, пароль и спцфический номер "позиции Master-server"
+2.2.3 На Slave меняем источник репликации, пользователя, пароль и специфический номер "позиции Master-server"
 
 ```
-mysql> CHANGE REPLICATION SOURCE TO SOURCE_HOST='mysql_master', SOURCE_USER='repl', SOURCE_PASSWORD='password', RELAY_LOG_POS=2618;
+mysql> CHANGE REPLICATION SOURCE TO SOURCE_HOST='mysql_master', SOURCE_USER='repl', SOURCE_PASSWORD='password', SOURCE_SSL=1, RELAY_LOG_POS=2618;
 ```
 
 ![Скриншот-6](https://github.com/Yuriykup/Netology_12-06-hw/blob/main/img/img6.png)
 
+2.2.4 Проверяем подключение репликации Slave к Master
+
+```
+mysql> SHOW REPLICA STATUS\G
+```
+
+![Скриншот-9](https://github.com/Yuriykup/Netology_12-06-hw/blob/main/img/img9.png)
+
+2.2.5 Создаём новую базу и таблицу на Master
+
+```
+DROP DATABASE IF EXISTS netology; 
+CREATE database netology;
+SHOW databases;
+USE netology;
+CREATE TABLE test_table (id INT PRIMARY KEY, name VARCHAR(50));
+INSERT INTO test_table VALUES (1, 'Master Record');
+```
+
+![Скриншот-8](https://github.com/Yuriykup/Netology_12-06-hw/blob/main/img/img8.png)
+
+2.2.5 Проверяем создание реплики базы данных на Slave
+
+```
+mysql> SHOW databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| netology           |
+| performance_schema |
+| sys                |
++--------------------+
+5 rows in set (0.00 sec)
+```
+
+![Скриншот-10](https://github.com/Yuriykup/Netology_12-06-hw/blob/main/img/img10.png)
 
 
 
