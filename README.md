@@ -149,20 +149,20 @@ read-only = 1
 2.1.7 Собираем образы:
 Сначала из двух Docker-файлов делаем готовые образы для слейва и мастера:
 ```
-sudo docker build -t mysql_slave -f ./Dockerfile_slave .
-sudo docker build -t mysql_master -f ./Dockerfile_master .
+$sudo docker build -t mysql_slave -f ./Dockerfile_slave .
+$sudo docker build -t mysql_master -f ./Dockerfile_master .
 ```
 
 2.1.8 Создаём сеть:
 ```
-sudo docker network create replication .
+$sudo docker network create replication .
 ```
 
 2.1.9. Запускаем контейнеры:
 Master и Slave подключаем к кионфиги, пробрасываем разные хост‑порты, указываем пароль и версию SQL:
 ```
-sudo docker run --name mysql_master -v ./master.cnf:/etc/my.cnf -p 3307:3306 -e MYSQL_ROOT_PASSWORD=kuv042026 -d mysql:8.4
-sudo docker run --name mysql_slave -v ./slave.cnf:/etc/my.cnf -p 3308:3306 -e MYSQL_ROOT_PASSWORD=kuv042026 -d mysql:8.4
+$sudo docker run --name mysql_master -v ./master.cnf:/etc/my.cnf -p 3307:3306 -e MYSQL_ROOT_PASSWORD=kuv042026 -d mysql:8.4
+$sudo docker run --name mysql_slave -v ./slave.cnf:/etc/my.cnf -p 3308:3306 -e MYSQL_ROOT_PASSWORD=kuv042026 -d mysql:8.4
 ```
 
 ![Скриншот-3](https://github.com/Yuriykup/Netology_12-06-hw/blob/main/img/img3.png)
@@ -170,7 +170,7 @@ sudo docker run --name mysql_slave -v ./slave.cnf:/etc/my.cnf -p 3308:3306 -e MY
 2.1.10 Проверка кофигурационных файлов в созданых серверах:
 - Master
 ```
-sudo docker exec -ti mysql_master /bin/bash
+$sudo docker exec -ti mysql_master /bin/bash
 bash-5.1# cat /etc/my.cnf
 [mysqld]
 server-id=1
@@ -181,7 +181,7 @@ bash-5.1# exit
 ```
 - Slave
 ```
-sudo docker exec -ti mysql_slave /bin/bash
+$sudo docker exec -ti mysql_slave /bin/bash
 bash-5.1# cat /etc/my
 my.cnf    my.cnf.d/ mysql/    
 bash-5.1# cat /etc/my.cnf
